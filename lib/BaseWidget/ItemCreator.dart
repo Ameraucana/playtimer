@@ -35,6 +35,7 @@ class _ItemCreatorState extends State<ItemCreator> {
     UnsavedChangeModel unsavedChangeModel = context.watch<UnsavedChangeModel>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(

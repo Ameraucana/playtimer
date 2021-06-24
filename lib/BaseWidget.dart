@@ -9,6 +9,7 @@ import 'package:playtimer/BaseWidget/SaveButton.dart';
 import 'BaseWidget/TimeDisplay.dart';
 import 'BaseWidget/ItemCreator.dart';
 import 'BaseWidget/Selector.dart';
+import 'BaseWidget/GroupingBox.dart';
 import 'classes/TimedItem.dart';
 import 'classes/UnsavedChangeModel.dart';
 import 'classes/Timekeeper.dart';
@@ -78,40 +79,54 @@ class BaseWidgetState extends State<BaseWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TimeDisplay(seconds: timekeeper.seconds, mergeSeconds: (definedSeconds) {
-            setState(() => timekeeper.merge(definedSeconds));
-          }),
-          SizedBox(width: 0, height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          GroupingBox(
             children: [
-              OutlinedButton.icon(
-                icon: Icon(Icons.play_arrow_sharp, size: 60),
-                label: Text("Start", style: style),
-                onPressed: timekeeper.isRunning ? null : () {
-                  setState(() => timekeeper.start(unsavedChangeModel, setState));
-                },
-                
+              TimeDisplay(seconds: timekeeper.seconds, mergeSeconds: (definedSeconds) {
+                setState(() => timekeeper.merge(definedSeconds));
+              }),
+              SizedBox(width: 0, height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OutlinedButton.icon(
+                    icon: Icon(Icons.play_arrow_sharp, size: 60),
+                    label: Text("Start", style: style),
+                    onPressed: timekeeper.isRunning ? null : () {
+                      setState(() => timekeeper.start(unsavedChangeModel, setState));
+                    },
+                    
+                  ),
+                  SizedBox(height: 0, width: 10),
+                  OutlinedButton.icon(
+                    icon: Icon(Icons.stop_sharp, size: 60),
+                    label: Text("Stop", style: style),
+                    onPressed: timekeeper.isRunning ? () {
+                      setState(() => timekeeper.stop());
+                    } : null,
+                  )         
+                ],
               ),
-              SizedBox(height: 0, width: 10),
-              OutlinedButton.icon(
-                icon: Icon(Icons.stop_sharp, size: 60),
-                label: Text("Stop", style: style),
-                onPressed: timekeeper.isRunning ? () {
-                  setState(() => timekeeper.stop());
-                } : null,
-              )         
-            ],
+            ]
           ),
           SizedBox(height: 10, width: 0),
-          ItemCreator(creationCallback: addNew),
-          Selector(
-            items: timedItems,
-            onSelect: (newItem) => setState(() {
-              timekeeper.select(newItem);
-              print("activeItem is now ${timekeeper.activeItem}");
-            }),
-            onRemove: remove
+          GroupingBox(
+            children: [
+              ItemCreator(creationCallback: addNew)
+            ]
+          ),
+          SizedBox(height: 10, width: 0),
+          GroupingBox(
+            children: [
+              Selector(
+                items: timedItems,
+                onSelect: (newItem) => setState(() {
+                  timekeeper.select(newItem);
+                  print("activeItem is now ${timekeeper.activeItem}");
+                }),
+                onRemove: remove
+              ),
+            ],
           ),
           SizedBox(height: 10, width: 0),
           SaveButton(onPressed: rewrite)

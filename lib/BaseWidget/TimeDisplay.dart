@@ -40,6 +40,7 @@ class TimeDisplay extends StatelessWidget {
     List<int> times = converter(seconds);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Numeral(time: times[0], secondsInUnit: 3600, style: style, onChanged: updateTime),

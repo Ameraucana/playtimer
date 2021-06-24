@@ -87,8 +87,8 @@ class _NumeralState extends State<Numeral> {
   }
   @override
   void dispose() { 
-    _focusNode.dispose();
-    _controller.dispose();
+    _focusNode?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 }

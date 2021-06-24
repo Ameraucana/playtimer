@@ -40,6 +40,7 @@ class _SelectorState extends State<Selector> {
   Widget build(BuildContext context) {
     UnsavedChangeModel unsavedChangeModel = context.watch<UnsavedChangeModel>();
     return Row(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         DropdownButton<TimedItem>(
