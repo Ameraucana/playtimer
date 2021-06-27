@@ -24,8 +24,11 @@ class _ItemCreatorState extends State<ItemCreator> {
     TimedItem newItem = TimedItem.yetUnchanged(_controller.text, 0);
     _controller.text = "";
     widget.creationCallback(newItem);
+    focusNode.unfocus();
    
   }
+
+  FocusNode focusNode = FocusNode();
   
   TextStyle style = TextStyle(
     fontFamily: "Roboto"
@@ -42,6 +45,7 @@ class _ItemCreatorState extends State<ItemCreator> {
           height: 50,
           width: 300,
           child: TextField(
+            focusNode: focusNode,
             controller: _controller,
             maxLines: 1,
             style: style,
