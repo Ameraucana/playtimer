@@ -19,11 +19,11 @@ class MyApp extends StatelessWidget {
       timedItems = TimedItem.decode(jsonString);
       if (timedItems.length == 0) {
         print("the length was 0");
-        timedItems.add(TimedItem("None", 0));
+        timedItems.add(TimedItem.yetUnchanged("None", 0));
       }
     } else {
       file.writeAsString("[]");
-      timedItems = [TimedItem("None", 0)];
+      timedItems = [TimedItem.yetUnchanged("None", 0)];
     }
     return timedItems;
   }

@@ -16,7 +16,7 @@ class GroupingBox extends StatelessWidget {
         color: Colors.grey[900]
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Flex(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,

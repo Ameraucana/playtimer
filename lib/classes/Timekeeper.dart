@@ -24,7 +24,7 @@ class Timekeeper {
     stop();
     activeItem = newItem;
     seconds = newItem.seconds;
-    print('${newItem.name}: ${newItem.seconds}');
+    print('new item: ${newItem.name}: ${newItem.seconds}');
   }
   void merge(int definedSeconds) {
     seconds = definedSeconds;

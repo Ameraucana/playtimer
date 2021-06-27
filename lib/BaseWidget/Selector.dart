@@ -14,7 +14,7 @@ class Selector extends StatefulWidget {
 }
 
 class _SelectorState extends State<Selector> {
-  _SelectorState(items) : dropdownValue = items[0]??TimedItem("None", 0);
+  _SelectorState(items) : dropdownValue = items[0]??TimedItem.yetUnchanged("None", 0);
   TimedItem dropdownValue;
 
   void pressedRemove(UnsavedChangeModel model) {
@@ -28,9 +28,10 @@ class _SelectorState extends State<Selector> {
         if (widget.items.length > 1) {
           setState(() => dropdownValue = widget.items[currentIndex+1]);
         } else {
-          setState(() => dropdownValue = null);
+          return;
         }
       }
+      //you must move to another element before deleting
       widget.onRemove(widget.items[currentIndex]);
     }
 
@@ -54,8 +55,8 @@ class _SelectorState extends State<Selector> {
             .map((item) => DropdownMenuItem(
               child: Text(item.name, style: TextStyle(fontFamily: "Roboto")),
               value: item
-            )
-          ).toList()
+            ) 
+          ).toList() 
         ),
         IconButton(
           icon: Icon(

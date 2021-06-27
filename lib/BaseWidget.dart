@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:playtimer/BaseWidget/LastChange.dart';
 import 'package:provider/provider.dart' show Provider;
 
 import 'package:playtimer/BaseWidget/SaveButton.dart';
@@ -46,18 +47,19 @@ class BaseWidgetState extends State<BaseWidget> {
 
   void remove(TimedItem item) {
     int currentIndex = timedItems.indexOf(item);
-    setState(() {
-      timedItems.remove(item);
-    });
+    print("currentIndex: $currentIndex");
     if (currentIndex > 0) {
       setState(() => timekeeper.select(timedItems[currentIndex-1]));
     } else {
       if (timedItems.length > 1) {
         setState(() => setState(() => timekeeper.select(timedItems[currentIndex+1])));
       } else {
-        setState(() => timekeeper.select(TimedItem("None", 0)));
+        return;
       }
     }
+    setState(() {
+      timedItems.remove(item);
+    });
   }
   void rewrite() async {
     Directory documentsDir = await getApplicationDocumentsDirectory();
@@ -84,6 +86,7 @@ class BaseWidgetState extends State<BaseWidget> {
               TimeDisplay(seconds: timekeeper.seconds, mergeSeconds: (definedSeconds) {
                 setState(() => timekeeper.merge(definedSeconds));
               }),
+
               SizedBox(width: 0, height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -126,6 +129,7 @@ class BaseWidgetState extends State<BaseWidget> {
                 }),
                 onRemove: remove
               ),
+              LastChange(lastChangeDate: timekeeper.activeItem.lastChangeDate)
             ],
           ),
           SizedBox(height: 10, width: 0),

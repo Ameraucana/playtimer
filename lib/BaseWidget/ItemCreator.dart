@@ -21,7 +21,7 @@ class _ItemCreatorState extends State<ItemCreator> {
       return;
     }
     model.madeChange();
-    TimedItem newItem = TimedItem(_controller.text, 0);
+    TimedItem newItem = TimedItem.yetUnchanged(_controller.text, 0);
     _controller.text = "";
     widget.creationCallback(newItem);
    

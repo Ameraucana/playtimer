@@ -1,17 +1,26 @@
 import 'dart:convert';
 
 class TimedItem {
-  TimedItem(String name, int seconds) {
+  TimedItem.yetUnchanged(String name, int seconds) {
     contents = {
       "name": name,
-      "seconds": seconds.toString()
+      "seconds": seconds.toString(),
+      "lastChangeDate": DateTime.now().toString()
+    };
+  }
+  TimedItem(String name, int seconds, DateTime lastChangeDate) {
+    contents = {
+      "name": name,
+      "seconds": seconds.toString(),
+      "lastChangeDate": lastChangeDate.toString()
     };
   }
 
   Map<String, String> contents;
 
-  get name => contents["name"];
-  get seconds => int.parse(contents["seconds"]);
+  String get name => contents["name"];
+  int get seconds => int.parse(contents["seconds"]);
+  DateTime get lastChangeDate => DateTime.parse(contents["lastChangeDate"]);
   set seconds (int newValue) => contents["seconds"] = newValue.toString();
 
   static List<TimedItem> decode(String json) {
@@ -21,7 +30,8 @@ class TimedItem {
     for (var item in decodedJson) {
       String name = item["name"];
       String seconds = item["seconds"];
-      items.add(TimedItem(name, int.parse(seconds)));
+      String lastChangeDate = item["lastChangeDate"];
+      items.add(TimedItem(name, int.parse(seconds), DateTime.parse(lastChangeDate)));
     }
     return items;
   }
@@ -35,4 +45,6 @@ class TimedItem {
   String toString() {
     return name;
   }
+
+  
 }
