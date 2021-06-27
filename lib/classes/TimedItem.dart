@@ -21,6 +21,7 @@ class TimedItem {
   String get name => contents["name"];
   int get seconds => int.parse(contents["seconds"]);
   DateTime get lastChangeDate => DateTime.parse(contents["lastChangeDate"]);
+  set lastChangeDate (DateTime newValue) => contents["lastChangeDate"] = newValue.toString();
   set seconds (int newValue) => contents["seconds"] = newValue.toString();
 
   static List<TimedItem> decode(String json) {

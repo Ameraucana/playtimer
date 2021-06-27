@@ -18,6 +18,7 @@ class Timekeeper {
   void stop() {
     repeatingTimer?.cancel();
     activeItem.seconds = seconds;
+    activeItem.lastChangeDate = DateTime.now();
     isRunning = false;
   }
   void select(TimedItem newItem) {
