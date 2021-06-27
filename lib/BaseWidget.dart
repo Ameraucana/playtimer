@@ -33,6 +33,7 @@ class BaseWidgetState extends State<BaseWidget> {
   Timekeeper timekeeper;
   List<TimedItem> timedItems;
   UnsavedChangeModel unsavedChangeModel = UnsavedChangeModel();
+  bool startButtonIsActive = true;
 
   @override
   void initState() { 
@@ -93,13 +94,16 @@ class BaseWidgetState extends State<BaseWidget> {
                 startButtonFunc: () {
                   setState(() {
                     timekeeper.start(unsavedChangeModel, setState);
+                    startButtonIsActive = false;
                   });
                 },
                 stopButtonFunc: () {
                   setState(() {
                     timekeeper.stop();
+                    startButtonIsActive = true;
                   });
-                }
+                },
+                startButtonIsActive: startButtonIsActive,
               )
             ]
           ),
@@ -116,6 +120,7 @@ class BaseWidgetState extends State<BaseWidget> {
                 items: timedItems,
                 onSelect: (newItem) => setState(() {
                   timekeeper.select(newItem);
+                  setState(() => startButtonIsActive = true);
                   print("activeItem is now ${timekeeper.activeItem}");
                 }),
                 onRemove: remove
