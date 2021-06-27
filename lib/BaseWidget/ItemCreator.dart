@@ -46,7 +46,6 @@ class _ItemCreatorState extends State<ItemCreator> {
             maxLines: 1,
             style: style,
             onEditingComplete: () => create(unsavedChangeModel),
-            
             decoration: InputDecoration(
               errorStyle: style,
               hintText: "Name of game or task",

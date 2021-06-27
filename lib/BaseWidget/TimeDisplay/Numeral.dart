@@ -69,9 +69,7 @@ class _NumeralState extends State<Numeral> {
           focusNode: _focusNode,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           controller: _controller,
-          
           onEditingComplete: () => setTime(unsavedChangeModel),
-          
           style: widget.style,
         ),
       );
