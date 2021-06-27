@@ -11,6 +11,7 @@ import 'BaseWidget/TimeDisplay.dart';
 import 'BaseWidget/ItemCreator.dart';
 import 'BaseWidget/Selector.dart';
 import 'BaseWidget/GroupingBox.dart';
+import 'BaseWidget/StartStopButton.dart';
 import 'classes/TimedItem.dart';
 import 'classes/UnsavedChangeModel.dart';
 import 'classes/Timekeeper.dart';
@@ -88,28 +89,18 @@ class BaseWidgetState extends State<BaseWidget> {
               }),
 
               SizedBox(width: 0, height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedButton.icon(
-                    icon: Icon(Icons.play_arrow_sharp, size: 60),
-                    label: Text("Start", style: style),
-                    onPressed: timekeeper.isRunning ? null : () {
-                      setState(() => timekeeper.start(unsavedChangeModel, setState));
-                    },
-                    
-                  ),
-                  SizedBox(height: 0, width: 10),
-                  OutlinedButton.icon(
-                    icon: Icon(Icons.stop_sharp, size: 60),
-                    label: Text("Stop", style: style),
-                    onPressed: timekeeper.isRunning ? () {
-                      setState(() => timekeeper.stop());
-                    } : null,
-                  )         
-                ],
-              ),
+              StartStopButton(
+                startButtonFunc: () {
+                  setState(() {
+                    timekeeper.start(unsavedChangeModel, setState);
+                  });
+                },
+                stopButtonFunc: () {
+                  setState(() {
+                    timekeeper.stop();
+                  });
+                }
+              )
             ]
           ),
           SizedBox(height: 10, width: 0),
