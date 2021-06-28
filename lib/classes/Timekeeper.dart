@@ -14,6 +14,7 @@ class Timekeeper {
     model.madeChange();
     repeatingTimer = Timer.periodic(Duration(seconds: 1), (_) {
       setState(() => seconds++);
+      model.madeChange();
     });
   }
   void stop() {
