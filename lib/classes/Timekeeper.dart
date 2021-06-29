@@ -11,7 +11,7 @@ class Timekeeper {
   void start(UnsavedChangeModel model, void Function(void Function()) setState) {
     isRunning = true;
     activeItem.lastChangeDate = DateTime.now();
-    model.madeChange();
+    setState(() => model.madeChange());
     repeatingTimer = Timer.periodic(Duration(seconds: 1), (_) {
       setState(() => seconds++);
       model.madeChange();
