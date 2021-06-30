@@ -3,12 +3,15 @@ import 'TimedItem.dart';
 import 'UnsavedChangeModel.dart';
 
 class Timekeeper {
+  Timekeeper(this.setState);
+  void Function(void Function()) setState;
+  UnsavedChangeModel model;
   Timer repeatingTimer;
   TimedItem activeItem;
   int seconds = 0;
   bool isRunning = false;
 
-  void start(UnsavedChangeModel model, void Function(void Function()) setState) {
+  void start() {
     isRunning = true;
     activeItem.lastChangeDate = DateTime.now();
     setState(() => model.madeChange());

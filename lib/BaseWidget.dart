@@ -27,21 +27,17 @@ class BaseWidget extends StatefulWidget {
 
 class BaseWidgetState extends State<BaseWidget> {
   BaseWidgetState(this.timedItems) {
-    timekeeper = Timekeeper()
+    unsavedChangeModel = UnsavedChangeModel();
+    timekeeper = Timekeeper(setState)
       ..activeItem = timedItems[0]
+      ..model = unsavedChangeModel
       ..seconds = timedItems.singleWhere((item) => item.name == timedItems[0].name).seconds;
    }
   Timekeeper timekeeper;
   List<TimedItem> timedItems;
-  UnsavedChangeModel unsavedChangeModel = UnsavedChangeModel();
+  UnsavedChangeModel unsavedChangeModel;
   bool startButtonIsActive = true;
 
-  @override
-  void initState() { 
-    super.initState();
-    print(timekeeper.seconds.toString());
-  }
-  
   void addNew(TimedItem item) {
     setState(() {
       timedItems.add(item);
@@ -95,7 +91,7 @@ class BaseWidgetState extends State<BaseWidget> {
           ) {
             if (!timekeeper.isRunning) {
               setState(() {
-                timekeeper.start(unsavedChangeModel, setState);
+                timekeeper.start();
                 startButtonIsActive = false;
               });
             } else {
@@ -120,7 +116,7 @@ class BaseWidgetState extends State<BaseWidget> {
                 StartStopButton(
                   startButtonFunc: () {
                     setState(() {
-                      timekeeper.start(unsavedChangeModel, setState);
+                      timekeeper.start();
                       startButtonIsActive = false;
                     });
                   },
