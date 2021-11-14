@@ -24,7 +24,6 @@ class MyApp extends StatelessWidget {
         "Content-Type": "application/json",
         "Api-Key": await rootBundle.loadString("assets/key")
       });
-      print("RESPONSE BODY: ${response.body}");
       if (response.statusCode == 200) {
         timedItems =
             TimedItem.decode(json.encode(json.decode(response.body)['data']));

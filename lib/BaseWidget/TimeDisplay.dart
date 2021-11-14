@@ -22,9 +22,7 @@ class TimeDisplay extends StatelessWidget {
   }
 
   void updateTime(int diff) {
-    print("seconds before: $seconds");
     mergeSeconds(seconds + diff);
-    print("$diff, $seconds");
   }
 
   @override

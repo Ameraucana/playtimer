@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'TimeDelta.dart';
+
 class TimedItem {
   TimedItem.yetUnchanged(String name, int seconds) {
     contents = {
@@ -17,6 +19,7 @@ class TimedItem {
   }
 
   Map<String, String> contents;
+  TimeDelta delta = TimeDelta();
 
   String get name => contents["name"];
   int get seconds => int.parse(contents["seconds"]);
@@ -26,7 +29,6 @@ class TimedItem {
 
   static List<TimedItem> decode(String json) {
     List<dynamic> decodedJson = jsonDecode(json);
-    print(decodedJson);
     List<TimedItem> items = [];
     for (var item in decodedJson) {
       String name = item["name"];
@@ -38,7 +40,6 @@ class TimedItem {
   }
   static String encode(List<TimedItem> items) {
     var mapItems = items.map((item) => item.contents).toList();
-    print(mapItems);
     return jsonEncode(mapItems);
   }
 

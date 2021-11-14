@@ -17,6 +17,7 @@ import 'BaseWidget/StartStopButton.dart';
 import 'classes/TimedItem.dart';
 import 'classes/UnsavedChangeModel.dart';
 import 'classes/Timekeeper.dart';
+import 'BaseWidget/TimeDisplay/DeltaDisplay.dart';
 
 class BaseWidget extends StatefulWidget {
   BaseWidget({@required this.timedItems});
@@ -68,7 +69,8 @@ class BaseWidgetState extends State<BaseWidget> {
   void rewrite() async {
     Directory documentsDir = await getApplicationDocumentsDirectory();
     print(documentsDir.path);
-    File file = File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
+    File file =
+        File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
     await file.create(recursive: true);
     String output = TimedItem.encode(timedItems);
     try {
@@ -118,6 +120,8 @@ class BaseWidgetState extends State<BaseWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GroupingBox(children: [
+              DeltaDisplay(delta: timekeeper.activeItem.delta),
+              SizedBox(width: 0, height: 10),
               TimeDisplay(
                   seconds: timekeeper.seconds,
                   mergeSeconds: (definedSeconds) {
@@ -157,7 +161,10 @@ class BaseWidgetState extends State<BaseWidget> {
               ],
             ),
             SizedBox(height: 10, width: 0),
-            SaveButton(onPressed: rewrite)
+            SaveButton(onPressed: () {
+              setState(() => timedItems.forEach((item) => item.delta.reset()));
+              rewrite();
+            })
           ],
         ),
       ),
