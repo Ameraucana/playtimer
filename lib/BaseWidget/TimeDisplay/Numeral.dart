@@ -26,6 +26,7 @@ class _NumeralState extends State<Numeral> {
   bool _amEditing = false;
   TextEditingController _controller;
   FocusNode _focusNode;
+  String editingValue;
 
   @override
   void initState() { 
@@ -58,7 +59,9 @@ class _NumeralState extends State<Numeral> {
   Widget build(BuildContext context) {
     UnsavedChangeModel unsavedChangeModel = context.watch<UnsavedChangeModel>();
     if (_amEditing) {
-      _controller = TextEditingController(text: widget.time.toString().padLeft(2, "0"));
+      // technically a workaround, "editingValue ??" ensures that if you have edited the value, it will
+      // not be reset to prior upon every passing second
+      _controller = TextEditingController(text: editingValue ?? widget.time.toString().padLeft(2, "0"));
       _controller.selection = TextSelection(baseOffset: 0, extentOffset: _controller.text.length);
       _focusNode.requestFocus();
       return SizedBox(
@@ -70,10 +73,13 @@ class _NumeralState extends State<Numeral> {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           controller: _controller,
           onEditingComplete: () => setTime(unsavedChangeModel),
+          onChanged: (value) => editingValue = value,
           style: widget.style,
         ),
       );
     } else {
+      // reset the editingValue
+      editingValue = null;
       return MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
