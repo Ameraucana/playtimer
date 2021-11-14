@@ -6,16 +6,15 @@ import 'package:provider/provider.dart';
 import 'package:playtimer/classes/UnsavedChangeModel.dart';
 
 class Numeral extends StatefulWidget {
-  Numeral({
-    Key key,
-    this.style,
-    @required this.time,
-    @required this.secondsInUnit,
-    @required this.onChanged
-  }) : super(key: key);
+  Numeral(
+      {Key key,
+      this.style,
+      @required this.time,
+      @required this.secondsInUnit,
+      @required this.onChanged})
+      : super(key: key);
   final TextStyle style;
-  final int time,
-            secondsInUnit;
+  final int time, secondsInUnit;
   final void Function(int) onChanged;
 
   @override
@@ -29,7 +28,7 @@ class _NumeralState extends State<Numeral> {
   String editingValue;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     _focusNode = FocusNode();
     _focusNode.addListener(() {
@@ -46,23 +45,27 @@ class _NumeralState extends State<Numeral> {
     if (widget.time != int.parse(_controller.text)) {
       model.madeChange();
     }
-    int diff = int.parse(_controller.text) * widget.secondsInUnit
-      - widget.time * widget.secondsInUnit;
+    int diff = int.parse(_controller.text) * widget.secondsInUnit -
+        widget.time * widget.secondsInUnit;
     widget.onChanged(diff);
     setState(() {
       _amEditing = false;
       _controller.text = "";
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel unsavedChangeModel = context.watch<UnsavedChangeModel>();
     if (_amEditing) {
       // technically a workaround, "editingValue ??" ensures that if you have edited the value, it will
       // not be reset to prior upon every passing second
-      _controller = TextEditingController(text: editingValue ?? widget.time.toString().padLeft(2, "0"));
-      _controller.selection = TextSelection(baseOffset: 0, extentOffset: _controller.text.length);
+      _controller = TextEditingController(
+          text: editingValue ?? widget.time.toString().padLeft(2, "0"));
+      if (editingValue == null) {
+        _controller.selection =
+            TextSelection(baseOffset: 0, extentOffset: _controller.text.length);
+      }
       _focusNode.requestFocus();
       return SizedBox(
         height: 100,
@@ -84,13 +87,15 @@ class _NumeralState extends State<Numeral> {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () => setState(() => _amEditing = true),
-          child: Text(widget.time.toString().padLeft(2, "0"), style: widget.style),
+          child:
+              Text(widget.time.toString().padLeft(2, "0"), style: widget.style),
         ),
       );
     }
   }
+
   @override
-  void dispose() { 
+  void dispose() {
     _focusNode?.dispose();
     _controller?.dispose();
     super.dispose();
