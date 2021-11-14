@@ -17,7 +17,6 @@ import 'BaseWidget/StartStopButton.dart';
 import 'classes/TimedItem.dart';
 import 'classes/UnsavedChangeModel.dart';
 import 'classes/Timekeeper.dart';
-import 'BaseWidget/TimeDisplay/DeltaDisplay.dart';
 
 class BaseWidget extends StatefulWidget {
   BaseWidget({@required this.timedItems});
@@ -120,10 +119,9 @@ class BaseWidgetState extends State<BaseWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GroupingBox(children: [
-              DeltaDisplay(delta: timekeeper.activeItem.delta),
               SizedBox(width: 0, height: 10),
               TimeDisplay(
-                  seconds: timekeeper.seconds,
+                  timedItem: timekeeper.activeItem,
                   mergeSeconds: (definedSeconds) {
                     setState(() => timekeeper.merge(definedSeconds));
                   }),

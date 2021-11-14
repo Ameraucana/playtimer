@@ -18,6 +18,7 @@ class Timekeeper {
     repeatingTimer = Timer.periodic(Duration(seconds: 1), (_) {
       setState(() {
         seconds++;
+        activeItem.seconds = seconds;
         activeItem.delta.increment();
       });
       model.madeChange();
