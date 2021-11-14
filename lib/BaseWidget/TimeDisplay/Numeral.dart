@@ -65,6 +65,9 @@ class _NumeralState extends State<Numeral> {
       if (editingValue == null) {
         _controller.selection =
             TextSelection(baseOffset: 0, extentOffset: _controller.text.length);
+      } else {
+        // this keeps the carat on the right side of the text
+        _controller.selection = TextSelection(baseOffset: _controller.text.length, extentOffset: _controller.text.length);
       }
       _focusNode.requestFocus();
       return SizedBox(
