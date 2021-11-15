@@ -14,7 +14,7 @@ class LastChange extends StatelessWidget {
       text: TextSpan(
         style: DefaultTextStyle.of(context).style,
         children: <TextSpan>[
-          TextSpan(text: "Last changed on ", style: TextStyle(fontFamily: "Roboto")),
+          TextSpan(text: "Last changed on "),
           TextSpan(text: formatter())
         ]
       )

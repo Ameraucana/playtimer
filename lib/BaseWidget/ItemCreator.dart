@@ -60,6 +60,7 @@ class _ItemCreatorState extends State<ItemCreator> {
         ),
         SizedBox(width: 10, height: 0),
         ElevatedButton.icon(
+          style: ButtonStyle(backgroundColor: MaterialStateProperty.all((Color(0xFF0827F5)))),
           icon: Icon(Icons.add_sharp),
           label: Text("Add", style: style),
           onPressed: () => create(unsavedChangeModel),

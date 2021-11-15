@@ -23,8 +23,8 @@ class _SaveButtonState extends State<SaveButton> with SingleTickerProviderStateM
     super.initState();
     _blinkController = AnimationController(vsync: this, duration: Duration(milliseconds: 80));
     _blueBlink = ColorTween(
-      begin: Colors.indigo,
-      end: Colors.indigo[100]
+      begin: Color(0xFF0827F5),
+      end: Color(0xFFA1ACF4)
     ).animate(_blinkController)..addListener(() {setState(() {});});
     _redBlink = ColorTween(
       begin: Colors.red,
