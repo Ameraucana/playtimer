@@ -14,6 +14,8 @@ class ItemCreator extends StatefulWidget {
 class _ItemCreatorState extends State<ItemCreator> {
   TextEditingController _controller = TextEditingController();
   bool _showError = false;
+  OutlineInputBorder _borderStyle =
+      OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 1));
 
   void create(UnsavedChangeModel model) async {
     if (_controller.text.isEmpty) {
@@ -25,17 +27,18 @@ class _ItemCreatorState extends State<ItemCreator> {
     _controller.text = "";
     widget.creationCallback(newItem);
     focusNode.unfocus();
-   
   }
 
   FocusNode focusNode = FocusNode();
-  
-  TextStyle style = TextStyle(
-    fontFamily: "Roboto"
-  );
+
+  TextStyle _style = TextStyle(fontFamily: "Roboto", color: Colors.white);
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel unsavedChangeModel = context.watch<UnsavedChangeModel>();
+    OutlineInputBorder _errorBorderStyle = OutlineInputBorder(
+        borderSide:
+            BorderSide(color: Theme.of(context).colorScheme.error, width: 1));
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -48,10 +51,17 @@ class _ItemCreatorState extends State<ItemCreator> {
             focusNode: focusNode,
             controller: _controller,
             maxLines: 1,
-            style: style,
+            style: _style,
             onEditingComplete: () => create(unsavedChangeModel),
             decoration: InputDecoration(
-              errorStyle: style,
+              enabledBorder: _borderStyle,
+              focusedBorder: _borderStyle,
+              focusedErrorBorder: _errorBorderStyle,
+              errorBorder: _borderStyle,
+              errorStyle: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontFamily: "Roboto"
+              ),
               hintText: "Name of game or task",
               errorText: _showError ? "Field must not be empty" : null,
             ),
@@ -59,10 +69,11 @@ class _ItemCreatorState extends State<ItemCreator> {
           ),
         ),
         SizedBox(width: 10, height: 0),
-        ElevatedButton.icon(
-          style: ButtonStyle(backgroundColor: MaterialStateProperty.all((Color(0xFF0827F5)))),
-          icon: Icon(Icons.add_sharp),
-          label: Text("Add", style: style),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.white), textStyle: _style),
+          icon: Icon(Icons.add_sharp, color: Colors.white),
+          label: Text("Add", style: _style),
           onPressed: () => create(unsavedChangeModel),
         )
       ],

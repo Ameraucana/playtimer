@@ -41,22 +41,20 @@ class DeltaDisplay extends StatelessWidget {
       textColor = Colors.white;
     }
 
-    if (delta.delta == 0) {
-      return SizedBox(height: 0, width: 0);
-    } else {
-      return RichText(
-          text: TextSpan(
-              style:
-                  TextStyle(fontFamily: "DSEG", fontSize: 20, color: textColor),
-              children: [
-            TextSpan(text: sign),
-            TextSpan(text: threeTimes[0].toString()),
-            TextSpan(text: "hours ", style: TextStyle(fontSize: 12)),
-            TextSpan(text: threeTimes[1].toString()),
-            TextSpan(text: "minutes ", style: TextStyle(fontSize: 12)),
-            TextSpan(text: threeTimes[2].toString()),
-            TextSpan(text: "seconds ", style: TextStyle(fontSize: 12))
-          ]));
-    }
+    return RichText(
+      text: TextSpan(
+        style:
+            TextStyle(fontFamily: "DSEG", fontSize: 20, color: delta.delta != 0 ? textColor : Colors.transparent),
+        children: [
+          TextSpan(text: sign),
+          TextSpan(text: threeTimes[0].toString()),
+          TextSpan(text: "hours ", style: TextStyle(fontSize: 12)),
+          TextSpan(text: threeTimes[1].toString()),
+          TextSpan(text: "minutes ", style: TextStyle(fontSize: 12)),
+          TextSpan(text: threeTimes[2].toString()),
+          TextSpan(text: "seconds ", style: TextStyle(fontSize: 12))
+        ]
+      )
+    );
   }
 }

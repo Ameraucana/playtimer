@@ -60,7 +60,7 @@ class _SelectorState extends State<Selector> {
         ),
         IconButton(
           icon: Icon(
-            Icons.delete_forever_sharp
+            Icons.delete_forever_outlined
           ),
           onPressed: () => pressedRemove(unsavedChangeModel)
         )

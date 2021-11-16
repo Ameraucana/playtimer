@@ -12,46 +12,35 @@ class SaveButton extends StatefulWidget {
   _SaveButtonState createState() => _SaveButtonState();
 }
 
-class _SaveButtonState extends State<SaveButton> with SingleTickerProviderStateMixin {
-  AnimationController _blinkController;
-  Animation<Color> _blueBlink;
-  Animation<Color> _redBlink;
+class _SaveButtonState extends State<SaveButton> {
+  Timer _blinkInterval;
   Timer _delayTimer;
-
-  @override
-  void initState() { 
-    super.initState();
-    _blinkController = AnimationController(vsync: this, duration: Duration(milliseconds: 80));
-    _blueBlink = ColorTween(
-      begin: Color(0xFF0827F5),
-      end: Color(0xFFA1ACF4)
-    ).animate(_blinkController)..addListener(() {setState(() {});});
-    _redBlink = ColorTween(
-      begin: Colors.red,
-      end: Colors.red[100]
-    ).animate(_blinkController)..addListener(() {setState(() {});});
-  }
+  bool _dispTBlueF = true;
 
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel needSaveModel = context.watch<UnsavedChangeModel>();
-    Animation<Color> displayColor = needSaveModel.shouldSave ? _redBlink : _blueBlink;
+    Color outlineNeutralColor = needSaveModel.shouldSave ? Colors.red : Colors.white;
     
     return SizedBox(
       height: 150,
       width: 300,
       child: MouseRegion(
         onEnter: (_) {
-          _blinkController.repeat();
-          _delayTimer = Timer(Duration(milliseconds: 400), () => _blinkController.reset());
+          _blinkInterval = Timer.periodic(Duration(milliseconds: 100), (timer) => setState(() => _dispTBlueF = !_dispTBlueF));
+          _delayTimer = Timer(Duration(milliseconds: 400), () {
+            setState(() => _dispTBlueF = true);
+            _blinkInterval.cancel();
+          });
         },
         onExit: (_) {
-          _blinkController.reset();
+          setState(() => _dispTBlueF = true);
           _delayTimer?.cancel();
+          _blinkInterval?.cancel();
         },
-        child: ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(displayColor.value)
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: _dispTBlueF ? outlineNeutralColor : Color(0xFF0000C8))
           ),
           onPressed: () {
             needSaveModel.didSave();
@@ -61,7 +50,7 @@ class _SaveButtonState extends State<SaveButton> with SingleTickerProviderStateM
             "Save",
             style: TextStyle(
               fontSize: 85,
-              color: Colors.blueGrey[100]
+              color: Colors.white
             ),
           )
         ),
@@ -70,8 +59,10 @@ class _SaveButtonState extends State<SaveButton> with SingleTickerProviderStateM
   }
 
   @override
-  void dispose() { 
-    _blinkController.dispose();
+  @override
+  void dispose() {
+    _blinkInterval?.cancel();
+    _delayTimer?.cancel();
     super.dispose();
   }
 }
