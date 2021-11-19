@@ -9,11 +9,13 @@ class LCDGridPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     //int pixelLength = size.width ~/ 122;
     int pixelLength = 6;
+    // horizontal lines
     for (int pos = 0; pos < size.height; pos += pixelLength)
     {
       canvas.drawLine(Offset(0, pos.toDouble()), Offset(size.width, pos.toDouble()), backgroundPaint);
     }
     
+    // vertical lines
     for (int pos = 0; pos < size.width; pos += pixelLength)
     {
       canvas.drawLine(Offset(pos.toDouble(), 0), Offset(pos.toDouble(), size.height), backgroundPaint);
