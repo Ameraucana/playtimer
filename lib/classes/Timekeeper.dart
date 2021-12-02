@@ -13,28 +13,30 @@ class Timekeeper {
 
   void start() {
     isRunning = true;
-    activeItem.lastChangeDate = DateTime.now();
-    setState(() => model.madeChange());
     repeatingTimer = Timer.periodic(Duration(seconds: 1), (_) {
       setState(() {
         seconds++;
         activeItem.seconds = seconds;
         activeItem.delta.increment();
       });
+      activeItem.lastChangeDate = DateTime.now();
       model.madeChange();
     });
   }
+
   void stop() {
     repeatingTimer?.cancel();
     activeItem.seconds = seconds;
     isRunning = false;
   }
+
   void select(TimedItem newItem) {
     stop();
     activeItem = newItem;
     seconds = newItem.seconds;
     print('new item: ${newItem.name}: ${newItem.seconds}');
   }
+
   void merge(int definedSeconds) {
     activeItem.delta.setTo(activeItem.seconds, definedSeconds);
     seconds = definedSeconds;
