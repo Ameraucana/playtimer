@@ -39,6 +39,7 @@ class Timekeeper {
 
   void merge(int definedSeconds) {
     activeItem.delta.setTo(activeItem.seconds, definedSeconds);
+    activeItem.lastChangeDate = DateTime.now();
     seconds = definedSeconds;
     activeItem.seconds = seconds;
   }
