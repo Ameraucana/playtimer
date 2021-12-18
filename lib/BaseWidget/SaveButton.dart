@@ -20,41 +20,36 @@ class _SaveButtonState extends State<SaveButton> {
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel needSaveModel = context.watch<UnsavedChangeModel>();
-    Color outlineNeutralColor = needSaveModel.shouldSave ? Colors.red : Colors.white;
-    
-    return SizedBox(
-      height: 150,
-      width: 300,
-      child: MouseRegion(
-        onEnter: (_) {
-          _blinkInterval = Timer.periodic(Duration(milliseconds: 100), (timer) => setState(() => _dispTBlueF = !_dispTBlueF));
-          _delayTimer = Timer(Duration(milliseconds: 400), () {
-            setState(() => _dispTBlueF = true);
-            _blinkInterval.cancel();
-          });
-        },
-        onExit: (_) {
+    Color outlineNeutralColor =
+        needSaveModel.shouldSave ? Colors.red : Colors.white;
+
+    return MouseRegion(
+      onEnter: (_) {
+        _blinkInterval = Timer.periodic(Duration(milliseconds: 100),
+            (timer) => setState(() => _dispTBlueF = !_dispTBlueF));
+        _delayTimer = Timer(Duration(milliseconds: 400), () {
           setState(() => _dispTBlueF = true);
-          _delayTimer?.cancel();
-          _blinkInterval?.cancel();
-        },
-        child: OutlinedButton(
+          _blinkInterval.cancel();
+        });
+      },
+      onExit: (_) {
+        setState(() => _dispTBlueF = true);
+        _delayTimer?.cancel();
+        _blinkInterval?.cancel();
+      },
+      child: OutlinedButton(
           style: OutlinedButton.styleFrom(
-            side: BorderSide(color: _dispTBlueF ? outlineNeutralColor : Color(0xFF0000C8))
-          ),
+              side: BorderSide(
+                  color:
+                      _dispTBlueF ? outlineNeutralColor : Color(0xFF0000C8))),
           onPressed: () {
             needSaveModel.didSave();
             widget.onPressed();
           },
           child: Text(
             "Save",
-            style: TextStyle(
-              fontSize: 85,
-              color: Colors.white
-            ),
-          )
-        ),
-      )
+            style: TextStyle(fontSize: 85, color: Colors.white),
+          )),
     );
   }
 
