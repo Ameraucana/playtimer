@@ -7,6 +7,10 @@ class LastChange extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return DisplayTime(lastChangeDate).display(context);
+    return Column(
+      children: [
+        DisplayTime(lastChangeDate).display(context),
+      ],
+    );
   }
 }

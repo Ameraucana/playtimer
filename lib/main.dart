@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
   Future<List<TimedItem>> getTimedItems() async {
     final String urlEndpoint = "https://json.psty.io/api_v1/stores/playtimer";
     Directory documentsDir = await getApplicationDocumentsDirectory();
-    File file = File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
+    File file =
+        File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
     await file.create(recursive: true);
     List<TimedItem> timedItems = [];
     try {
@@ -26,8 +27,8 @@ class MyApp extends StatelessWidget {
         "Api-Key": await rootBundle.loadString("assets/key")
       });
       if (response.statusCode == 200) {
-        timedItems =
-            TimedItem.decode(json.encode(json.decode(response.body)['data']));
+        timedItems = TimedItem.formTimedItems(
+            json.encode(json.decode(response.body)['data']));
       }
     } catch (e) {
       print(e);
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
     if (timedItems.isEmpty) {
       if (await file.exists()) {
         String jsonString = await file.readAsString();
-        timedItems = TimedItem.decode(jsonString);
+        timedItems = TimedItem.formTimedItems(jsonString);
         if (timedItems.length == 0) {
           print("the length was 0");
           timedItems.add(TimedItem.yetUnchanged("None", 0));
@@ -53,47 +54,45 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Playtimer',
         theme: ThemeData(
-          fontFamily: "DSEG",
-          
-          scaffoldBackgroundColor: Color(0xFF0000C2),
-          textSelectionTheme: TextSelectionThemeData(
-            cursorColor: Colors.white,
-            selectionColor: Color(0xFF00008F)
-          ),
-          canvasColor: Color(0xFF00008F),
-          colorScheme: ColorScheme(
-            background: Color(0xFF0000C2),
-            onBackground: Colors.white,
-
-            primary: Color(0xFF0000C2),
-            onPrimary: Colors.white,
-            primaryVariant: Color(0xFF0000A9),
-
-            secondary: Color(0xFF00008F),
-            onSecondary: Colors.white,
-            secondaryVariant: Color(0xFF000082),
-
-            brightness: Brightness.dark,
-
-            error: Color(0xFFf7d800),
-            onError: Colors.black,
-
-            surface: Color(0xFF00008F),
-            onSurface: Colors.white
-          )
-        ),
+            fontFamily: "DSEG",
+            scaffoldBackgroundColor: Color(0xFF0000C2),
+            textSelectionTheme: TextSelectionThemeData(
+                cursorColor: Colors.white, selectionColor: Color(0xFF00008F)),
+            cardColor: Color(0xFF0000A2),
+            outlinedButtonTheme: OutlinedButtonThemeData(
+                style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white),
+                    textStyle:
+                        TextStyle(color: Colors.white, fontFamily: "DSEG"),
+                    onSurface: Colors.white)),
+            canvasColor: Color(0xFF00008F),
+            colorScheme: ColorScheme(
+                background: Color(0xFF0000C2),
+                onBackground: Colors.white,
+                primary: Colors.white,
+                onPrimary: Colors.white,
+                primaryVariant: Color(0xFF0000A9),
+                secondary: Color(0xFF00008F),
+                onSecondary: Colors.white,
+                secondaryVariant: Color(0xFF000082),
+                brightness: Brightness.dark,
+                error: Color(0xFFf7d800),
+                onError: Colors.black,
+                surface: Color(0xFF00008F),
+                onSurface: Colors.white)),
         home: Scaffold(
             body: CustomPaint(
-              foregroundPainter: LCDGridPainter(),
-              child: FutureBuilder(
-                  future: getTimedItems(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return Center(child: BaseWidget(timedItems: snapshot.data));
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  }),
-            )));
+          foregroundPainter: LCDGridPainter(),
+          child: FutureBuilder(
+              future: getTimedItems(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Center(child: BaseWidget(timedItems: snapshot.data));
+                } else {
+                  return Center(
+                      child: CircularProgressIndicator(color: Colors.white));
+                }
+              }),
+        )));
   }
 }

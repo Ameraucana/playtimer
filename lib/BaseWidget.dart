@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:playtimer/BaseWidget/LastChange.dart';
+import 'package:playtimer/HistoryPage.dart';
 import 'package:provider/provider.dart' show Provider;
 
 import 'package:playtimer/BaseWidget/SaveButton.dart';
@@ -31,9 +32,7 @@ class BaseWidgetState extends State<BaseWidget> {
     timekeeper = Timekeeper(setState)
       ..activeItem = timedItems[0]
       ..model = unsavedChangeModel
-      ..seconds = timedItems
-          .singleWhere((item) => item.name == timedItems[0].name)
-          .seconds;
+      ..seconds = timedItems[0].seconds;
   }
   Timekeeper timekeeper;
   List<TimedItem> timedItems;
@@ -71,7 +70,7 @@ class BaseWidgetState extends State<BaseWidget> {
     File file =
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
     await file.create(recursive: true);
-    String output = TimedItem.encode(timedItems);
+    String output = TimedItem.formOutput(timedItems);
     try {
       http.Response response = await http.put(Uri.parse(urlEndpoint),
           headers: {
@@ -86,7 +85,6 @@ class BaseWidgetState extends State<BaseWidget> {
     await file.writeAsString(output);
   }
 
-  TextStyle style = TextStyle(fontFamily: "DSEG", fontSize: 30);
   FocusNode keyboardListenerFocusNode = FocusNode();
   @override
   Widget build(context) {
@@ -155,12 +153,34 @@ class BaseWidgetState extends State<BaseWidget> {
                           print("activeItem is now ${timekeeper.activeItem}");
                         }),
                     onRemove: remove),
-                LastChange(lastChangeDate: timekeeper.activeItem.lastChangeDate)
+                LastChange(
+                    lastChangeDate: timekeeper.activeItem.lastChangeDate),
+                SizedBox(height: 10, width: 0),
+                OutlinedButton(
+                    child: Text("HISTORY"),
+                    onPressed: () => Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                            reverseTransitionDuration: Duration(seconds: 0),
+                            transitionDuration: Duration(seconds: 0),
+                            pageBuilder: (context, _, __) =>
+                                HistoryPage(timekeeper: timekeeper))))
               ],
             ),
             SizedBox(height: 10, width: 0),
             SaveButton(onPressed: () {
-              setState(() => timedItems.forEach((item) => item.delta.reset()));
+              setState(() {
+                // We need to stop first so the stop date is set if it needs to be,
+                // and need that argument so that it isn't overwritten if unneeded
+                timekeeper.stop(fromSaveButton: true);
+                startButtonIsActive = true;
+                timedItems.forEach((item) {
+                  // You must keep completeRecord before delta.reset
+                  // because an empty TimeDelta is useless here
+                  item.changeHistory.completeRecord(item.delta);
+                  item.delta.reset();
+                });
+              });
               rewrite();
             })
           ],

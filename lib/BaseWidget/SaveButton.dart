@@ -48,7 +48,7 @@ class _SaveButtonState extends State<SaveButton> {
           },
           child: Text(
             "Save",
-            style: TextStyle(fontSize: 85, color: Colors.white),
+            style: TextStyle(fontSize: 85),
           )),
     );
   }
