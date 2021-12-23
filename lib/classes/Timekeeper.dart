@@ -7,12 +7,18 @@ class Timekeeper {
   void Function(void Function()) setState;
   UnsavedChangeModel model;
   Timer repeatingTimer;
+  Timer stubSecondTimer;
   TimedItem activeItem;
   int seconds = 0;
   bool isRunning = false;
 
+  // If you want to do something when the start button is pressed,
+  // put it here if it uses TimedItem state
   void start() {
     isRunning = true;
+    stubSecondTimer = Timer(Duration(seconds: 1), () {
+      activeItem.changeHistory.stub.begin();
+    });
     repeatingTimer = Timer.periodic(Duration(seconds: 1), (_) {
       setState(() {
         seconds++;
@@ -24,8 +30,10 @@ class Timekeeper {
     });
   }
 
-  void stop() {
+  void stop({bool fromSaveButton = false}) {
     repeatingTimer?.cancel();
+    stubSecondTimer?.cancel();
+    activeItem.changeHistory.stub.setStopDate(fromSaveButton: fromSaveButton);
     activeItem.seconds = seconds;
     isRunning = false;
   }
@@ -39,6 +47,8 @@ class Timekeeper {
 
   void merge(int definedSeconds) {
     activeItem.delta.setTo(activeItem.seconds, definedSeconds);
+    activeItem.changeHistory.stub.begin();
+    activeItem.changeHistory.stub.usedBonusTime();
     activeItem.lastChangeDate = DateTime.now();
     seconds = definedSeconds;
     activeItem.seconds = seconds;
