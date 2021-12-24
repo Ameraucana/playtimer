@@ -9,6 +9,7 @@ class TimedItem {
     this.name = name;
     this.seconds = seconds;
     this.lastChangeDate = DateTime.now();
+    this.changeHistory = ChangeHistory();
   }
   // this constructor is invoked through decode
   TimedItem(String name, String seconds, String lastChangeDate,

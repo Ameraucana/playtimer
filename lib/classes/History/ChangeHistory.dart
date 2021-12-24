@@ -5,6 +5,7 @@ import 'package:playtimer/classes/TimeDelta.dart';
 class ChangeHistory {
   ChangeHistory.fromJsonList(List<dynamic> unformedList)
       : _records = unformedList.map((item) => Record.fromString(item)).toList();
+  ChangeHistory();
   RecordStub stub = RecordStub();
   List<Record> _records = [];
 
