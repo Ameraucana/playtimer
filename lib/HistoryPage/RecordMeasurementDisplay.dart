@@ -18,6 +18,8 @@ class RecordMeasurementDisplay extends StatelessWidget {
     List<String> hms = getTimeValues(_record);
     return RichText(
       text: TextSpan(style: TextStyle(fontFamily: "DSEG"), children: [
+        if (_record.deltaTime.isNegative)
+          TextSpan(text: "-", style: lightBackground),
         if (int.parse(hms[0]) != 0) ...[
           TextSpan(text: hms[0], style: lightBackground),
           TextSpan(text: " hours ")
