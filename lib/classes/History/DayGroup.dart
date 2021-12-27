@@ -23,36 +23,39 @@ class DayGroup {
   }
 
   Widget toWidget(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Container(
-            decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                border: Border.all(
-                    color: Theme.of(context).scaffoldBackgroundColor)),
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DisplayTime(firstMember.startTime)
-                          .display(context, dateOnly: true, showTime: false),
-                      Text(" :  "),
-                      RecordMeasurementDisplay(cumulativeSeconds, scale: .5)
-                    ],
-                  ),
-                  Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Column(
-                        children: members
-                            .map((member) => member.toWidget(context))
-                            .toList(),
-                      ))
-                ])),
-      ),
-    );
+    if (members.length > 1) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor.withOpacity(.6),
+              ),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        DisplayTime(firstMember.startTime)
+                            .display(context, dateOnly: true, showTime: false),
+                        Text(" :  "),
+                        RecordMeasurementDisplay(cumulativeSeconds, scale: .5)
+                      ],
+                    ),
+                    Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: members
+                              .map((member) => member.toWidget(context))
+                              .toList(),
+                        ))
+                  ])),
+        ),
+      );
+    } else {
+      return firstMember.toWidget(context);
+    }
   }
 }

@@ -2,8 +2,8 @@ import "package:flutter/material.dart";
 
 class RecordMeasurementDisplay extends StatelessWidget {
   RecordMeasurementDisplay(this._seconds, {double scale = 1.0})
-      : numberSize = scale * 25,
-        letterSize = scale * 15;
+      : numberSize = scale * 25, // needed this for
+        letterSize = scale * 15; // DayGroup.dart
   final int _seconds;
   final double numberSize;
   final double letterSize;

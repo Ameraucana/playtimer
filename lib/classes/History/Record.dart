@@ -37,14 +37,12 @@ class Record {
       widthFactor: .5,
       child: Card(
           borderOnForeground: false,
-          shape: Border.all(
-              color: Theme.of(context).scaffoldBackgroundColor, width: 1.5),
+          shape: Border(),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.end,
                 children: [
                   RecordMeasurementDisplay(_deltaTime),
                   if (usedBonusTime)
@@ -52,7 +50,7 @@ class Record {
                         style: TextStyle(color: Colors.green[400]))
                 ],
               ),
-              Row(mainAxisSize: MainAxisSize.min, children: [
+              Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
                 DisplayTime(startTime).display(context, dateOnly: true),
                 Icon(Icons.arrow_forward),
                 DisplayTime(stopTime).display(context, dateOnly: true)
