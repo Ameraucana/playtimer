@@ -30,7 +30,8 @@ class DisplayTime {
     return "${dateObj.month}/${dateObj.day}/${dateObj.year}";
   }
 
-  Widget display(BuildContext context, {bool dateOnly = false}) {
+  Widget display(BuildContext context,
+      {bool dateOnly = false, bool showTime = true}) {
     return RichText(
         text: TextSpan(
             style: DefaultTextStyle.of(context).style,
@@ -39,10 +40,11 @@ class DisplayTime {
           TextSpan(
               text: _date(),
               style: TextStyle(backgroundColor: Color(0xFF00008F))),
-          TextSpan(text: " at "),
-          TextSpan(
-              text: _time(),
-              style: TextStyle(backgroundColor: Color(0xFF00008F))),
+          if (showTime) TextSpan(text: " at "),
+          if (showTime)
+            TextSpan(
+                text: _time(),
+                style: TextStyle(backgroundColor: Color(0xFF00008F))),
         ]));
   }
 }

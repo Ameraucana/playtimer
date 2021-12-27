@@ -163,8 +163,10 @@ class BaseWidgetState extends State<BaseWidget> {
                         PageRouteBuilder(
                             reverseTransitionDuration: Duration(seconds: 0),
                             transitionDuration: Duration(seconds: 0),
-                            pageBuilder: (context, _, __) =>
-                                HistoryPage(timekeeper: timekeeper))))
+                            pageBuilder: (context, _, __) => HistoryPage(
+                                  changeHistory:
+                                      timekeeper.activeItem.changeHistory,
+                                ))))
               ],
             ),
             SizedBox(height: 10, width: 0),

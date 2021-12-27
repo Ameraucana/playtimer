@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:playtimer/HistoryPage/RecordMeasurementDisplay.dart';
+import 'package:playtimer/classes/DisplayTime.dart';
 import 'package:playtimer/classes/History/RecordStub.dart';
 
 class Record {
@@ -27,5 +30,35 @@ class Record {
   @override
   String toString() {
     return "${_startTime.toString()},${_stopTime.toString()},$_deltaTime,$_usedBonusTime";
+  }
+
+  Widget toWidget(BuildContext context) {
+    return FractionallySizedBox(
+      widthFactor: .5,
+      child: Card(
+          borderOnForeground: false,
+          shape: Border.all(
+              color: Theme.of(context).scaffoldBackgroundColor, width: 1.5),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  RecordMeasurementDisplay(_deltaTime),
+                  if (usedBonusTime)
+                    Text("Used bonus time",
+                        style: TextStyle(color: Colors.green[400]))
+                ],
+              ),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                DisplayTime(startTime).display(context, dateOnly: true),
+                Icon(Icons.arrow_forward),
+                DisplayTime(stopTime).display(context, dateOnly: true)
+              ])
+            ]),
+          )),
+    );
   }
 }
