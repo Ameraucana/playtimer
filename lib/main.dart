@@ -33,6 +33,9 @@ class MyApp extends StatelessWidget {
     } catch (e) {
       print(e);
     }
+    // This isn't in the catch because an error in the response doesn't
+    // throw an error. Being disconnected from the internet, however,
+    // would cause an error to be thrown when the host resolution failed
     if (timedItems.isEmpty) {
       if (await file.exists()) {
         String jsonString = await file.readAsString();
