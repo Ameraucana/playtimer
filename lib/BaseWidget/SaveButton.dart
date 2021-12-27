@@ -25,7 +25,7 @@ class _SaveButtonState extends State<SaveButton> {
 
     return MouseRegion(
       onEnter: (_) {
-        _blinkInterval = Timer.periodic(Duration(milliseconds: 100),
+        _blinkInterval = Timer.periodic(Duration(milliseconds: 50),
             (timer) => setState(() => _dispTBlueF = !_dispTBlueF));
         _delayTimer = Timer(Duration(milliseconds: 400), () {
           setState(() => _dispTBlueF = true);
@@ -39,6 +39,7 @@ class _SaveButtonState extends State<SaveButton> {
       },
       child: OutlinedButton(
           style: OutlinedButton.styleFrom(
+            animationDuration: Duration(milliseconds: 0),
               side: BorderSide(
                   color:
                       _dispTBlueF ? outlineNeutralColor : Color(0xFF0000C8))),
@@ -53,7 +54,6 @@ class _SaveButtonState extends State<SaveButton> {
     );
   }
 
-  @override
   @override
   void dispose() {
     _blinkInterval?.cancel();

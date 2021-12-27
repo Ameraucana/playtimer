@@ -71,9 +71,9 @@ class _ItemCreatorState extends State<ItemCreator> {
         SizedBox(width: 10, height: 0),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.white), textStyle: _style),
+              side: BorderSide(color: Colors.white)),
           icon: Icon(Icons.add_sharp, color: Colors.white),
-          label: Text("Add", style: _style),
+          label: Text("Add"),
           onPressed: () => create(unsavedChangeModel),
         )
       ],
