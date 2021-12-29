@@ -67,10 +67,15 @@ class BaseWidgetState extends State<BaseWidget> {
   void rewrite() async {
     Directory documentsDir = await getApplicationDocumentsDirectory();
     print(documentsDir.path);
-    File file =
+    File saveFile =
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
-    await file.create(recursive: true);
+    File localOnlyChangesIndicFile = File(path.join(
+        documentsDir.path, "playtimer_data", "haveLocalOnlyChanges.txt"));
+    await saveFile.create(recursive: true);
     String output = TimedItem.formOutput(timedItems);
+
+    bool didWriteToRemote =
+        false; // this is used on the online-offline sync solution
     try {
       http.Response response = await http.put(Uri.parse(urlEndpoint),
           headers: {
@@ -79,10 +84,17 @@ class BaseWidgetState extends State<BaseWidget> {
           },
           body: output);
       print(response.statusCode);
+      if (response.statusCode == 200) {
+        await localOnlyChangesIndicFile.writeAsString("no");
+        didWriteToRemote = true;
+      }
     } catch (e) {
       print(e);
     }
-    await file.writeAsString(output);
+    await saveFile.writeAsString(output);
+    if (!didWriteToRemote) {
+      await localOnlyChangesIndicFile.writeAsString("yes");
+    }
   }
 
   FocusNode keyboardListenerFocusNode = FocusNode();

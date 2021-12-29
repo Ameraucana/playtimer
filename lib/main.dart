@@ -17,35 +17,44 @@ class MyApp extends StatelessWidget {
   Future<List<TimedItem>> getTimedItems() async {
     final String urlEndpoint = "https://json.psty.io/api_v1/stores/playtimer";
     Directory documentsDir = await getApplicationDocumentsDirectory();
-    File file =
+    File localOnlyChangesIndicFile = File(path.join(
+        documentsDir.path, "playtimer_data", "haveLocalOnlyChanges.txt"));
+    File saveFile =
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
-    await file.create(recursive: true);
+    await localOnlyChangesIndicFile.create(recursive: true);
+    await saveFile.create(recursive: true);
     List<TimedItem> timedItems = [];
-    try {
-      http.Response response = await http.get(Uri.parse(urlEndpoint), headers: {
-        "Content-Type": "application/json",
-        "Api-Key": await rootBundle.loadString("assets/key")
-      });
-      if (response.statusCode == 200) {
-        timedItems = TimedItem.formTimedItems(
-            json.encode(json.decode(response.body)['data']));
+
+    // This is how I'm going to fix the online-offline sync problem
+    // (if I save to file offline, it will not be written to online)
+    if (await localOnlyChangesIndicFile.readAsString() == "no") {
+      try {
+        http.Response response =
+            await http.get(Uri.parse(urlEndpoint), headers: {
+          "Content-Type": "application/json",
+          "Api-Key": await rootBundle.loadString("assets/key")
+        });
+        if (response.statusCode == 200) {
+          timedItems = TimedItem.formTimedItems(
+              json.encode(json.decode(response.body)['data']));
+        }
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {
-      print(e);
     }
     // This isn't in the catch because an error in the response doesn't
     // throw an error. Being disconnected from the internet, however,
     // would cause an error to be thrown when the host resolution failed
     if (timedItems.isEmpty) {
-      if (await file.exists()) {
-        String jsonString = await file.readAsString();
+      if (await saveFile.exists()) {
+        String jsonString = await saveFile.readAsString();
         timedItems = TimedItem.formTimedItems(jsonString);
         if (timedItems.length == 0) {
           print("the length was 0");
           timedItems.add(TimedItem.yetUnchanged("None", 0));
         }
       } else {
-        file.writeAsString("[]");
+        saveFile.writeAsString("[]");
         timedItems = [TimedItem.yetUnchanged("None", 0)];
       }
     }
