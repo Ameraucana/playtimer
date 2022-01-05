@@ -46,7 +46,7 @@ class Record {
                 children: [
                   RecordMeasurementDisplay(_deltaTime),
                   if (usedBonusTime)
-                    Text("Used bonus time",
+                    Text("Modified",
                         style: TextStyle(color: Colors.green[400]))
                 ],
               ),
