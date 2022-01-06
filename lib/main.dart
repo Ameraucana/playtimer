@@ -22,6 +22,12 @@ class MyApp extends StatelessWidget {
     File saveFile =
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
     await localOnlyChangesIndicFile.create(recursive: true);
+
+    // if it's empty
+    if (await localOnlyChangesIndicFile.readAsString() != "yes") {
+      await localOnlyChangesIndicFile.writeAsString("no");
+    }
+
     await saveFile.create(recursive: true);
     List<TimedItem> timedItems = [];
 
