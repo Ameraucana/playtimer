@@ -29,14 +29,19 @@ class RecordMeasurementDisplay extends StatelessWidget {
               TextSpan(text: "-", style: lightBackground),
             if (int.parse(hms[0]) != 0) ...[
               TextSpan(text: hms[0], style: lightBackground),
-              TextSpan(text: " hours ")
+              if (int.parse(hms[0]) == 1) TextSpan(text: " hour ")
+              else TextSpan(text: " hours ")
             ],
             if (int.parse(hms[1]) != 0) ...[
               TextSpan(text: hms[1], style: lightBackground),
-              TextSpan(text: " minutes ")
+              if (int.parse(hms[1]) == 1) TextSpan(text: " minute ")
+              else TextSpan(text: " minutes ")
             ],
-            TextSpan(text: hms[2], style: lightBackground),
-            TextSpan(text: " seconds ")
+            if (int.parse(hms[2]) != 0) ...[
+              TextSpan(text: hms[2], style: lightBackground),
+              if (int.parse(hms[2]) == 1) TextSpan(text: " second")
+              else TextSpan(text: " seconds")
+            ]
           ]),
     );
   }
