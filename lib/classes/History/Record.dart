@@ -46,8 +46,7 @@ class Record {
                 children: [
                   RecordMeasurementDisplay(_deltaTime),
                   if (usedBonusTime)
-                    Text("Modified",
-                        style: TextStyle(color: Colors.green[400]))
+                    Text("Modified", style: TextStyle(color: Colors.green[400]))
                 ],
               ),
               Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
@@ -59,4 +58,8 @@ class Record {
           )),
     );
   }
+
+  bool operator ==(object) => object is Record && object.startTime == startTime;
+
+  int get hashCode => startTime.hashCode ^ stopTime.hashCode;
 }

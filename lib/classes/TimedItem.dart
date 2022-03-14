@@ -27,6 +27,13 @@ class TimedItem {
   int seconds;
   DateTime lastChangeDate;
 
+  // when this is true, the TimedItem will not be included in the Selector or in
+  // the upload to remote, essentially removing it. it can't just be deleted
+  // because the case that something is removed and the case that something is
+  // added from another application instance while this one is running share
+  // the same conditions of being on remote and not being on local
+  bool isMarkedForOmission = false;
+
   static List<TimedItem> formTimedItems(String json) {
     // MIRROR formOutput AS BELOW
     List<dynamic> unformedTimedItems = jsonDecode(json);
@@ -53,6 +60,49 @@ class TimedItem {
         .toList();
     return jsonEncode(listOfEncodedTimedItems);
   }
+
+  // merges into the local list
+  static void merge(List<TimedItem> local, List<TimedItem> remote) {
+    for (TimedItem potentiallyDifferingItem in remote) {
+      // account for new TimedItems create in another application instance
+      if (!local.contains(potentiallyDifferingItem)) {
+        local.add(potentiallyDifferingItem);
+        continue;
+      }
+      // deleting is undone post-save without this (also introduces bug)
+      // remote.removeWhere((oldItem) => !local.contains(oldItem));
+
+      for (TimedItem localEntry in local) {
+        if (potentiallyDifferingItem == localEntry) {
+          // combine seconds times
+          localEntry.seconds =
+              potentiallyDifferingItem.seconds + localEntry.delta.delta;
+          // replace lastChangeDate if remote is more recent
+          if (potentiallyDifferingItem.lastChangeDate
+              .isAfter(localEntry.lastChangeDate)) {
+            localEntry.lastChangeDate = potentiallyDifferingItem.lastChangeDate;
+          }
+          // merge records
+          potentiallyDifferingItem.changeHistory.records
+              .where((remoteRecord) =>
+                  !localEntry.changeHistory.records.contains(remoteRecord))
+              .forEach((differingRecord) {
+            int targetIndex = localEntry.changeHistory.records.indexWhere(
+                (localRecord) =>
+                    differingRecord.startTime.isAfter(localRecord.startTime));
+            print(
+                "${localEntry.name}: ${differingRecord.startTime} -> ${differingRecord.stopTime} in ${differingRecord.deltaTime} at index $targetIndex");
+            localEntry.changeHistory.records
+                .insert(targetIndex, differingRecord);
+          });
+        }
+      }
+    }
+    print(local);
+  }
+
+  bool operator ==(object) => object is TimedItem && object.name == name;
+  int get hashCode => name.hashCode;
 
   @override
   String toString() {
