@@ -17,54 +17,47 @@ class MyApp extends StatelessWidget {
   Future<List<TimedItem>> getTimedItems() async {
     final String urlEndpoint = "https://json.psty.io/api_v1/stores/playtimer";
     Directory documentsDir = await getApplicationDocumentsDirectory();
-    File localOnlyChangesIndicFile = File(path.join(
-        documentsDir.path, "playtimer_data", "haveLocalOnlyChanges.txt"));
     File saveFile =
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
-    await localOnlyChangesIndicFile.create(recursive: true);
-
-    // in case it's empty
-    if (await localOnlyChangesIndicFile.readAsString() != "yes") {
-      await localOnlyChangesIndicFile.writeAsString("no");
-    }
 
     await saveFile.create(recursive: true);
-    List<TimedItem> timedItems = [];
+    List<TimedItem> remoteTimedItems = [];
+    List<TimedItem> localTimedItems = [];
 
-    // This is how I'm going to fix the online-offline sync problem
-    // (if I save to file offline, it will not be written to online)
-    if (await localOnlyChangesIndicFile.readAsString() == "no") {
-      try {
-        http.Response response =
-            await http.get(Uri.parse(urlEndpoint), headers: {
-          "Content-Type": "application/json",
-          "Api-Key": await rootBundle.loadString("assets/key")
-        });
-        if (response.statusCode == 200) {
-          timedItems = TimedItem.formTimedItems(
-              json.encode(json.decode(response.body)['data']));
+    try {
+      http.Response response = await http.get(Uri.parse(urlEndpoint), headers: {
+        "Content-Type": "application/json",
+        "Api-Key": await rootBundle.loadString("assets/key")
+      });
+      if (response.statusCode == 200) {
+        remoteTimedItems = TimedItem.formTimedItems(
+            json.encode(json.decode(response.body)['data']));
+        if (await saveFile.exists()) {
+          String jsonString = await saveFile.readAsString();
+          localTimedItems = TimedItem.formTimedItems(jsonString);
         }
-      } catch (e) {
-        print(e);
+        TimedItem.merge(localTimedItems, remoteTimedItems);
       }
+    } catch (e) {
+      print(e);
     }
     // This isn't in the catch because an error in the response doesn't
     // throw an error. Being disconnected from the internet, however,
     // would cause an error to be thrown when the host resolution failed
-    if (timedItems.isEmpty) {
+    if (localTimedItems.isEmpty) {
       if (await saveFile.exists()) {
         String jsonString = await saveFile.readAsString();
-        timedItems = TimedItem.formTimedItems(jsonString);
-        if (timedItems.length == 0) {
+        localTimedItems = TimedItem.formTimedItems(jsonString);
+        if (localTimedItems.length == 0) {
           print("the length was 0");
-          timedItems.add(TimedItem.yetUnchanged("None", 0));
+          localTimedItems.add(TimedItem.yetUnchanged("None", 0));
         }
       } else {
         saveFile.writeAsString("[]");
-        timedItems = [TimedItem.yetUnchanged("None", 0)];
+        localTimedItems = [TimedItem.yetUnchanged("None", 0)];
       }
     }
-    return timedItems;
+    return localTimedItems;
   }
 
   @override
@@ -89,10 +82,10 @@ class MyApp extends StatelessWidget {
                 onBackground: Colors.white,
                 primary: Colors.white,
                 onPrimary: Colors.white,
-                primaryVariant: Color(0xFF0000A9),
+                primaryContainer: Color(0xFF0000A9),
                 secondary: Color(0xFF00008F),
                 onSecondary: Colors.white,
-                secondaryVariant: Color(0xFF000082),
+                secondaryContainer: Color(0xFF000082),
                 brightness: Brightness.dark,
                 error: Color(0xFFf7d800),
                 onError: Colors.black,

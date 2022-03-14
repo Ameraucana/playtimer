@@ -6,7 +6,7 @@ import 'package:playtimer/classes/UnsavedChangeModel.dart';
 
 class SaveButton extends StatefulWidget {
   const SaveButton({Key key, @required this.onPressed}) : super(key: key);
-  final void Function() onPressed;
+  final Future<bool> Function() onPressed;
 
   @override
   _SaveButtonState createState() => _SaveButtonState();
@@ -15,13 +15,16 @@ class SaveButton extends StatefulWidget {
 class _SaveButtonState extends State<SaveButton> {
   Timer _blinkInterval;
   Timer _delayTimer;
+  bool _failedSave = false;
   bool _dispTBlueF = true;
 
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel needSaveModel = context.watch<UnsavedChangeModel>();
-    Color outlineNeutralColor =
+    Color outlineColorConsideringUnsavedChange =
         needSaveModel.shouldSave ? Colors.red : Colors.white;
+    Color outlineColorConsideringFailedSave =
+        _failedSave ? Colors.yellow[700] : outlineColorConsideringUnsavedChange;
 
     return MouseRegion(
       onEnter: (_) {
@@ -39,13 +42,18 @@ class _SaveButtonState extends State<SaveButton> {
       },
       child: OutlinedButton(
           style: OutlinedButton.styleFrom(
-            animationDuration: Duration(milliseconds: 0),
+              animationDuration: Duration(milliseconds: 0),
               side: BorderSide(
-                  color:
-                      _dispTBlueF ? outlineNeutralColor : Color(0xFF0000C8))),
-          onPressed: () {
+                  color: _dispTBlueF
+                      ? outlineColorConsideringFailedSave
+                      : Color(0xFF0000C8))),
+          onPressed: () async {
             needSaveModel.didSave();
-            widget.onPressed();
+            //function returns true if online upload succeeds
+            bool uploadSucceeded = await widget.onPressed();
+            setState(() {
+              _failedSave = !uploadSucceeded;
+            });
           },
           child: Text(
             "Save",

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -60,23 +61,39 @@ class BaseWidgetState extends State<BaseWidget> {
       }
     }
     setState(() {
-      timedItems.remove(item);
+      item.isMarkedForOmission = true;
     });
   }
 
-  void rewrite() async {
+  Future<bool> rewrite() async {
     Directory documentsDir = await getApplicationDocumentsDirectory();
     print(documentsDir.path);
     File saveFile =
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
-    File localOnlyChangesIndicFile = File(path.join(
-        documentsDir.path, "playtimer_data", "haveLocalOnlyChanges.txt"));
     await saveFile.create(recursive: true);
-    String output = TimedItem.formOutput(timedItems);
 
-    bool didWriteToRemote =
-        false; // this is used on the online-offline sync solution
+    bool uploadSucceeded = true;
+    String output = "";
+
     try {
+      http.Response potentiallyDifferingResponse =
+          await http.get(Uri.parse(urlEndpoint), headers: {
+        "Content-Type": "application/json",
+        "Api-Key": await rootBundle.loadString("assets/key")
+      });
+      List<TimedItem> potentiallyDifferingInfo = TimedItem.formTimedItems(
+          json.encode(json.decode(potentiallyDifferingResponse.body)['data']));
+
+      setState(() {
+        TimedItem.merge(timedItems, potentiallyDifferingInfo);
+      });
+
+      setState(() {
+        timedItems.forEach((timedItem) => timedItem.delta.reset());
+        timedItems.removeWhere((timedItem) => timedItem.isMarkedForOmission);
+      });
+
+      output = TimedItem.formOutput(timedItems);
       http.Response response = await http.put(Uri.parse(urlEndpoint),
           headers: {
             "Content-Type": "application/json",
@@ -84,17 +101,14 @@ class BaseWidgetState extends State<BaseWidget> {
           },
           body: output);
       print(response.statusCode);
-      if (response.statusCode == 200) {
-        await localOnlyChangesIndicFile.writeAsString("no");
-        didWriteToRemote = true;
-      }
     } catch (e) {
+      uploadSucceeded = false;
+      output = TimedItem.formOutput(timedItems);
       print(e);
     }
     await saveFile.writeAsString(output);
-    if (!didWriteToRemote) {
-      await localOnlyChangesIndicFile.writeAsString("yes");
-    }
+
+    return uploadSucceeded;
   }
 
   FocusNode keyboardListenerFocusNode = FocusNode();
@@ -182,7 +196,7 @@ class BaseWidgetState extends State<BaseWidget> {
               ],
             ),
             SizedBox(height: 10, width: 0),
-            SaveButton(onPressed: () {
+            SaveButton(onPressed: () async {
               setState(() {
                 // We need to stop first so the stop date is set if it needs to be,
                 // and need that argument so that it isn't overwritten if unneeded
@@ -192,10 +206,11 @@ class BaseWidgetState extends State<BaseWidget> {
                   // You must keep completeRecord before delta.reset
                   // because an empty TimeDelta is useless here
                   item.changeHistory.completeRecord(item.delta);
-                  item.delta.reset();
                 });
               });
-              rewrite();
+              bool succeeded = await rewrite();
+              setState(() => timedItems.forEach((item) => item.delta.reset()));
+              return succeeded;
             })
           ],
         ),

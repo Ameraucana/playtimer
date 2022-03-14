@@ -57,6 +57,7 @@ class _SelectorState extends State<Selector> {
             },
             value: dropdownValue,
             items: widget.items
+                .where((item) => !item.isMarkedForOmission)
                 .map((item) => DropdownMenuItem(
                     child:
                         Text(item.name, style: TextStyle(fontFamily: "Roboto")),
