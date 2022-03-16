@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:playtimer/BaseWidget/LastChange.dart';
+import 'package:playtimer/BaseWidget/SynchronictyIndicator.dart';
 import 'package:playtimer/HistoryPage.dart';
 import 'package:provider/provider.dart' show Provider;
 
@@ -21,14 +22,15 @@ import 'classes/UnsavedChangeModel.dart';
 import 'classes/Timekeeper.dart';
 
 class BaseWidget extends StatefulWidget {
-  BaseWidget({@required this.timedItems});
+  BaseWidget({@required this.timedItems, @required this.didDownload});
+  final bool didDownload;
   final List<TimedItem> timedItems;
   @override
-  createState() => BaseWidgetState(timedItems);
+  createState() => BaseWidgetState(timedItems, didDownload);
 }
 
 class BaseWidgetState extends State<BaseWidget> {
-  BaseWidgetState(this.timedItems) {
+  BaseWidgetState(this.timedItems, this.didDownload) {
     unsavedChangeModel = UnsavedChangeModel();
     timekeeper = Timekeeper(setState)
       ..activeItem = timedItems[0]
@@ -39,6 +41,8 @@ class BaseWidgetState extends State<BaseWidget> {
   List<TimedItem> timedItems;
   UnsavedChangeModel unsavedChangeModel;
   bool startButtonIsActive = true;
+  bool didDownload;
+  bool saveIsInProgress = false;
   final String urlEndpoint = r"https://json.psty.io/api_v1/stores/playtimer";
 
   void addNew(TimedItem item) {
@@ -80,7 +84,7 @@ class BaseWidgetState extends State<BaseWidget> {
           await http.get(Uri.parse(urlEndpoint), headers: {
         "Content-Type": "application/json",
         "Api-Key": await rootBundle.loadString("assets/key")
-      });
+      }).timeout(Duration(seconds: 10));
       List<TimedItem> potentiallyDifferingInfo = TimedItem.formTimedItems(
           json.encode(json.decode(potentiallyDifferingResponse.body)['data']));
 
@@ -89,19 +93,23 @@ class BaseWidgetState extends State<BaseWidget> {
       });
 
       setState(() {
-        timedItems.forEach((timedItem) => timedItem.delta.reset());
         timedItems.removeWhere((timedItem) => timedItem.isMarkedForOmission);
       });
 
       output = TimedItem.formOutput(timedItems);
-      http.Response response = await http.put(Uri.parse(urlEndpoint),
-          headers: {
-            "Content-Type": "application/json",
-            "Api-Key": await rootBundle.loadString("assets/key")
-          },
-          body: output);
+      http.Response response = await http
+          .put(Uri.parse(urlEndpoint),
+              headers: {
+                "Content-Type": "application/json",
+                "Api-Key": await rootBundle.loadString("assets/key")
+              },
+              body: output)
+          .timeout(Duration(seconds: 10));
       print(response.statusCode);
     } catch (e) {
+      setState(() {
+        timedItems.removeWhere((timedItem) => timedItem.isMarkedForOmission);
+      });
       uploadSucceeded = false;
       output = TimedItem.formOutput(timedItems);
       print(e);
@@ -145,12 +153,14 @@ class BaseWidgetState extends State<BaseWidget> {
             GroupingBox(children: [
               SizedBox(width: 0, height: 10),
               TimeDisplay(
+                  disabled: saveIsInProgress,
                   timedItem: timekeeper.activeItem,
                   mergeSeconds: (definedSeconds) {
                     setState(() => timekeeper.merge(definedSeconds));
                   }),
               SizedBox(width: 0, height: 10),
               StartStopButton(
+                disabled: saveIsInProgress,
                 startButtonFunc: () {
                   setState(() {
                     timekeeper.start();
@@ -167,12 +177,18 @@ class BaseWidgetState extends State<BaseWidget> {
               )
             ]),
             SizedBox(height: 10, width: 0),
-            GroupingBox(children: [ItemCreator(creationCallback: addNew)]),
+            GroupingBox(children: [
+              ItemCreator(
+                creationCallback: addNew,
+                disabled: saveIsInProgress,
+              )
+            ]),
             SizedBox(height: 10, width: 0),
             GroupingBox(
               children: [
                 Selector(
                     items: timedItems,
+                    disabled: saveIsInProgress,
                     onSelect: (newItem) => setState(() {
                           timekeeper.select(newItem);
                           setState(() => startButtonIsActive = true);
@@ -182,17 +198,24 @@ class BaseWidgetState extends State<BaseWidget> {
                 LastChange(
                     lastChangeDate: timekeeper.activeItem.lastChangeDate),
                 SizedBox(height: 10, width: 0),
-                OutlinedButton(
-                    child: Text("HISTORY"),
-                    onPressed: () => Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                            reverseTransitionDuration: Duration(seconds: 0),
-                            transitionDuration: Duration(seconds: 0),
-                            pageBuilder: (context, _, __) => HistoryPage(
-                                  changeHistory:
-                                      timekeeper.activeItem.changeHistory,
-                                ))))
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OutlinedButton(
+                        child: Text("HISTORY"),
+                        onPressed: () => Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                                reverseTransitionDuration: Duration(seconds: 0),
+                                transitionDuration: Duration(seconds: 0),
+                                pageBuilder: (context, _, __) => HistoryPage(
+                                      changeHistory:
+                                          timekeeper.activeItem.changeHistory,
+                                    )))),
+                    SizedBox(width: 5),
+                    SynchronicityIndicator(didDownload: didDownload)
+                  ],
+                )
               ],
             ),
             SizedBox(height: 10, width: 0),
@@ -206,11 +229,12 @@ class BaseWidgetState extends State<BaseWidget> {
                   // You must keep completeRecord before delta.reset
                   // because an empty TimeDelta is useless here
                   item.changeHistory.completeRecord(item.delta);
+                  item.delta.reset();
                 });
+                saveIsInProgress = true;
               });
-              bool succeeded = await rewrite();
-              setState(() => timedItems.forEach((item) => item.delta.reset()));
-              return succeeded;
+              didDownload = await rewrite();
+              setState(() => saveIsInProgress = false);
             })
           ],
         ),

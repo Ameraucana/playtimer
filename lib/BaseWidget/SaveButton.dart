@@ -6,7 +6,7 @@ import 'package:playtimer/classes/UnsavedChangeModel.dart';
 
 class SaveButton extends StatefulWidget {
   const SaveButton({Key key, @required this.onPressed}) : super(key: key);
-  final Future<bool> Function() onPressed;
+  final Future<void> Function() onPressed;
 
   @override
   _SaveButtonState createState() => _SaveButtonState();
@@ -15,25 +15,25 @@ class SaveButton extends StatefulWidget {
 class _SaveButtonState extends State<SaveButton> {
   Timer _blinkInterval;
   Timer _delayTimer;
-  bool _failedSave = false;
   bool _dispTBlueF = true;
+  bool _saveInProgress = false;
 
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel needSaveModel = context.watch<UnsavedChangeModel>();
     Color outlineColorConsideringUnsavedChange =
         needSaveModel.shouldSave ? Colors.red : Colors.white;
-    Color outlineColorConsideringFailedSave =
-        _failedSave ? Colors.yellow[700] : outlineColorConsideringUnsavedChange;
 
     return MouseRegion(
       onEnter: (_) {
-        _blinkInterval = Timer.periodic(Duration(milliseconds: 50),
-            (timer) => setState(() => _dispTBlueF = !_dispTBlueF));
-        _delayTimer = Timer(Duration(milliseconds: 400), () {
-          setState(() => _dispTBlueF = true);
-          _blinkInterval.cancel();
-        });
+        if (!_saveInProgress) {
+          _blinkInterval = Timer.periodic(Duration(milliseconds: 50),
+              (timer) => setState(() => _dispTBlueF = !_dispTBlueF));
+          _delayTimer = Timer(Duration(milliseconds: 400), () {
+            setState(() => _dispTBlueF = true);
+            _blinkInterval.cancel();
+          });
+        }
       },
       onExit: (_) {
         setState(() => _dispTBlueF = true);
@@ -45,19 +45,25 @@ class _SaveButtonState extends State<SaveButton> {
               animationDuration: Duration(milliseconds: 0),
               side: BorderSide(
                   color: _dispTBlueF
-                      ? outlineColorConsideringFailedSave
+                      ? outlineColorConsideringUnsavedChange
                       : Color(0xFF0000C8))),
-          onPressed: () async {
-            needSaveModel.didSave();
-            //function returns true if online upload succeeds
-            bool uploadSucceeded = await widget.onPressed();
-            setState(() {
-              _failedSave = !uploadSucceeded;
-            });
-          },
-          child: Text(
-            "Save",
-            style: TextStyle(fontSize: 85),
+          onPressed: !_saveInProgress
+              ? () async {
+                  setState(() => _saveInProgress = true);
+                  await widget.onPressed();
+                  setState(() => _saveInProgress = false);
+                  needSaveModel.didSave();
+                }
+              : null,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Save",
+                style: TextStyle(fontSize: 85),
+              ),
+              if (_saveInProgress) CircularProgressIndicator()
+            ],
           )),
     );
   }

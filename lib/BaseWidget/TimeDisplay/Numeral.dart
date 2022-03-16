@@ -10,11 +10,13 @@ class Numeral extends StatefulWidget {
       this.style,
       @required this.time,
       @required this.secondsInUnit,
-      @required this.onChanged})
+      @required this.onChanged,
+      @required this.disabled})
       : super(key: key);
   final TextStyle style;
   final int time, secondsInUnit;
   final void Function(int) onChanged;
+  final bool disabled;
 
   @override
   _NumeralState createState() => _NumeralState();
@@ -90,7 +92,9 @@ class _NumeralState extends State<Numeral> {
       return MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
-          onTap: () => setState(() => _amEditing = true),
+          onTap: () => setState(() {
+            if (!widget.disabled) _amEditing = true;
+          }),
           child:
               Text(widget.time.toString().padLeft(2, "0"), style: widget.style),
         ),

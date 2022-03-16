@@ -76,7 +76,7 @@ class TimedItem {
         if (potentiallyDifferingItem == localEntry) {
           // combine seconds times
           localEntry.seconds =
-              potentiallyDifferingItem.seconds + localEntry.delta.delta;
+              potentiallyDifferingItem.seconds + localEntry.delta.preresetDelta;
           // replace lastChangeDate if remote is more recent
           if (potentiallyDifferingItem.lastChangeDate
               .isAfter(localEntry.lastChangeDate)) {

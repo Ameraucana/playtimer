@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import '../classes/TimedItem.dart';
 
 class ItemCreator extends StatefulWidget {
-  ItemCreator({Key key, this.creationCallback}) : super(key: key);
+  ItemCreator({Key key, this.creationCallback, @required this.disabled})
+      : super(key: key);
   final void Function(TimedItem) creationCallback;
+  final bool disabled;
 
   @override
   _ItemCreatorState createState() => _ItemCreatorState();
@@ -48,6 +50,7 @@ class _ItemCreatorState extends State<ItemCreator> {
           height: 50,
           width: 300,
           child: TextField(
+            enabled: !widget.disabled,
             focusNode: focusNode,
             controller: _controller,
             maxLines: 1,
@@ -59,9 +62,8 @@ class _ItemCreatorState extends State<ItemCreator> {
               focusedErrorBorder: _errorBorderStyle,
               errorBorder: _borderStyle,
               errorStyle: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontFamily: "Roboto"
-              ),
+                  color: Theme.of(context).colorScheme.error,
+                  fontFamily: "Roboto"),
               hintText: "Name of game or task",
               errorText: _showError ? "Field must not be empty" : null,
             ),
@@ -70,11 +72,11 @@ class _ItemCreatorState extends State<ItemCreator> {
         ),
         SizedBox(width: 10, height: 0),
         OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.white)),
+          style:
+              OutlinedButton.styleFrom(side: BorderSide(color: Colors.white)),
           icon: Icon(Icons.add_sharp, color: Colors.white),
           label: Text("Add"),
-          onPressed: () => create(unsavedChangeModel),
+          onPressed: !widget.disabled ? () => create(unsavedChangeModel) : null,
         )
       ],
     );

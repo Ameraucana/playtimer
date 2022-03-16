@@ -9,11 +9,13 @@ class Selector extends StatefulWidget {
       {Key key,
       @required this.items,
       @required this.onSelect,
-      @required this.onRemove})
+      @required this.onRemove,
+      @required this.disabled})
       : super(key: key);
   final List<TimedItem> items;
   final Function(TimedItem) onSelect;
   final Function(TimedItem) onRemove;
+  final bool disabled;
 
   @override
   _SelectorState createState() => _SelectorState(items);
@@ -51,10 +53,12 @@ class _SelectorState extends State<Selector> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         DropdownButton<TimedItem>(
-            onChanged: (TimedItem newValue) {
-              setState(() => dropdownValue = newValue);
-              widget.onSelect(newValue);
-            },
+            onChanged: !widget.disabled
+                ? (TimedItem newValue) {
+                    setState(() => dropdownValue = newValue);
+                    widget.onSelect(newValue);
+                  }
+                : null,
             value: dropdownValue,
             items: widget.items
                 .where((item) => !item.isMarkedForOmission)
@@ -65,13 +69,15 @@ class _SelectorState extends State<Selector> {
                 .toList()),
         IconButton(
             icon: Icon(Icons.delete_forever_outlined),
-            onPressed: () => showDialog(
-                context: context,
-                builder: (context) => DeleteDialog(
-                      onConfirm: pressedRemove,
-                      item: dropdownValue,
-                      changeModel: unsavedChangeModel,
-                    )))
+            onPressed: !widget.disabled
+                ? () => showDialog(
+                    context: context,
+                    builder: (context) => DeleteDialog(
+                          onConfirm: pressedRemove,
+                          item: dropdownValue,
+                          changeModel: unsavedChangeModel,
+                        ))
+                : null)
       ],
     );
   }

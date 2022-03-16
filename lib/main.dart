@@ -14,7 +14,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  Future<List<TimedItem>> getTimedItems() async {
+  Future<Map<String, dynamic>> getTimedItems() async {
     final String urlEndpoint = "https://json.psty.io/api_v1/stores/playtimer";
     Directory documentsDir = await getApplicationDocumentsDirectory();
     File saveFile =
@@ -24,11 +24,13 @@ class MyApp extends StatelessWidget {
     List<TimedItem> remoteTimedItems = [];
     List<TimedItem> localTimedItems = [];
 
+    bool requestSucceeded = true;
+
     try {
       http.Response response = await http.get(Uri.parse(urlEndpoint), headers: {
         "Content-Type": "application/json",
         "Api-Key": await rootBundle.loadString("assets/key")
-      });
+      }).timeout(Duration(seconds: 10));
       if (response.statusCode == 200) {
         remoteTimedItems = TimedItem.formTimedItems(
             json.encode(json.decode(response.body)['data']));
@@ -39,6 +41,7 @@ class MyApp extends StatelessWidget {
         TimedItem.merge(localTimedItems, remoteTimedItems);
       }
     } catch (e) {
+      requestSucceeded = false;
       print(e);
     }
     // This isn't in the catch because an error in the response doesn't
@@ -57,7 +60,7 @@ class MyApp extends StatelessWidget {
         localTimedItems = [TimedItem.yetUnchanged("None", 0)];
       }
     }
-    return localTimedItems;
+    return {"timedItems": localTimedItems, "didDownload": requestSucceeded};
   }
 
   @override
@@ -98,7 +101,11 @@ class MyApp extends StatelessWidget {
               future: getTimedItems(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Center(child: BaseWidget(timedItems: snapshot.data));
+                  return Center(
+                      child: BaseWidget(
+                    timedItems: snapshot.data["timedItems"],
+                    didDownload: snapshot.data["didDownload"],
+                  ));
                 } else {
                   return Center(
                       child: CircularProgressIndicator(color: Colors.white));

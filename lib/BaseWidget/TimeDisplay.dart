@@ -5,11 +5,15 @@ import 'TimeDisplay/Numeral.dart';
 
 class TimeDisplay extends StatelessWidget {
   const TimeDisplay(
-      {Key key, @required this.timedItem, @required this.mergeSeconds})
+      {Key key,
+      @required this.timedItem,
+      @required this.mergeSeconds,
+      @required this.disabled})
       : super(key: key);
 
   final TimedItem timedItem;
   final void Function(int) mergeSeconds;
+  final bool disabled;
 
   List<int> converter(int seconds) {
     int hours = (seconds / 3600).floor();
@@ -42,19 +46,22 @@ class TimeDisplay extends StatelessWidget {
                 time: times[0],
                 secondsInUnit: 3600,
                 style: style,
-                onChanged: updateTime),
+                onChanged: updateTime,
+                disabled: disabled),
             Text("hours", style: smallStyle),
             Numeral(
                 time: times[1],
                 secondsInUnit: 60,
                 style: style,
-                onChanged: updateTime),
+                onChanged: updateTime,
+                disabled: disabled),
             Text("minutes", style: smallStyle),
             Numeral(
                 time: times[2],
                 secondsInUnit: 1,
                 style: style,
-                onChanged: updateTime),
+                onChanged: updateTime,
+                disabled: disabled),
             Text("seconds", style: smallStyle)
           ],
         ),
