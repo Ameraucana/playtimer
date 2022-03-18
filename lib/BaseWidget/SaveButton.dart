@@ -21,8 +21,8 @@ class _SaveButtonState extends State<SaveButton> {
   @override
   Widget build(BuildContext context) {
     UnsavedChangeModel needSaveModel = context.watch<UnsavedChangeModel>();
-    Color outlineColorConsideringUnsavedChange =
-        needSaveModel.shouldSave ? Colors.red : Colors.white;
+    String buttonTextConsideringUnsavedChange =
+        needSaveModel.shouldSave ? "Save" : "Reload";
 
     return MouseRegion(
       onEnter: (_) {
@@ -44,9 +44,7 @@ class _SaveButtonState extends State<SaveButton> {
           style: OutlinedButton.styleFrom(
               animationDuration: Duration(milliseconds: 0),
               side: BorderSide(
-                  color: _dispTBlueF
-                      ? outlineColorConsideringUnsavedChange
-                      : Color(0xFF0000C8))),
+                  color: _dispTBlueF ? Colors.white : Color(0xFF0000C8))),
           onPressed: !_saveInProgress
               ? () async {
                   setState(() => _saveInProgress = true);
@@ -59,7 +57,7 @@ class _SaveButtonState extends State<SaveButton> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Save",
+                buttonTextConsideringUnsavedChange,
                 style: TextStyle(fontSize: 85),
               ),
               if (_saveInProgress) CircularProgressIndicator()
