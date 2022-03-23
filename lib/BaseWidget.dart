@@ -8,7 +8,6 @@ import 'package:path/path.dart' as path;
 import 'package:playtimer/BaseWidget/LastChange.dart';
 import 'package:playtimer/BaseWidget/SynchronictyIndicator.dart';
 import 'package:playtimer/HistoryPage.dart';
-import 'package:playtimer/LoadingIndicator.dart';
 import 'package:provider/provider.dart' show Provider;
 
 import 'package:playtimer/BaseWidget/SaveButton.dart';
