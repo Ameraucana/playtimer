@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:playtimer/LoadingIndicator.dart';
 import 'BaseWidget.dart';
 import 'classes/TimedItem.dart';
 import 'package:playtimer/BaseWidget/painters/LCDGridPainter.dart';
@@ -107,8 +108,7 @@ class MyApp extends StatelessWidget {
                     didDownload: snapshot.data["didDownload"],
                   ));
                 } else {
-                  return Center(
-                      child: CircularProgressIndicator(color: Colors.white));
+                  return Center(child: LoadingIndicator());
                 }
               }),
         )));

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:playtimer/LoadingIndicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _SaveButtonState extends State<SaveButton> {
                 buttonTextConsideringUnsavedChange,
                 style: TextStyle(fontSize: 85),
               ),
-              if (_saveInProgress) CircularProgressIndicator()
+              if (_saveInProgress) LoadingIndicator()
             ],
           )),
     );
