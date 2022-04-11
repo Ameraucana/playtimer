@@ -13,7 +13,7 @@ class ChangeHistory {
 
   void completeRecord(TimeDelta delta) {
     if (stub.isFresh) {
-      _records = [Record(stub, delta.delta), ..._records];
+      _records.insert(0, Record(stub, delta.delta));
       stub.reset();
     }
   }

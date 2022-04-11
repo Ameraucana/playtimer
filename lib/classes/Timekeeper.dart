@@ -26,6 +26,7 @@ class Timekeeper {
         activeItem.delta.increment();
       });
       activeItem.lastChangeDate = DateTime.now();
+      activeItem.changeHistory.stub.advanceStopDate();
       model.madeChange();
     });
   }
@@ -33,7 +34,6 @@ class Timekeeper {
   void stop({bool fromSaveButton = false}) {
     repeatingTimer?.cancel();
     stubSecondTimer?.cancel();
-    activeItem.changeHistory.stub.setStopDate(fromSaveButton: fromSaveButton);
     activeItem.seconds = seconds;
     isRunning = false;
   }
@@ -48,6 +48,7 @@ class Timekeeper {
   void merge(int definedSeconds) {
     activeItem.delta.setTo(activeItem.seconds, definedSeconds);
     activeItem.changeHistory.stub.begin();
+    activeItem.changeHistory.stub.advanceStopDate();
     activeItem.changeHistory.stub.usedBonusTime();
     activeItem.lastChangeDate = DateTime.now();
     seconds = definedSeconds;
