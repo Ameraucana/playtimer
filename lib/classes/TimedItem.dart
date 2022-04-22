@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:playtimer/classes/History/ChangeHistory.dart';
 
@@ -87,9 +88,13 @@ class TimedItem {
               .where((remoteRecord) =>
                   !localEntry.changeHistory.records.contains(remoteRecord))
               .forEach((differingRecord) {
-            int targetIndex = localEntry.changeHistory.records.indexWhere(
-                (localRecord) =>
-                    differingRecord.startTime.isAfter(localRecord.startTime));
+            // if indexWhere doesn't find an element that satisfies the conidtion,
+            // it returns -1, an invalid index, which will be the case if the
+            // list is empty. this is why max() is used
+            int targetIndex = max(
+                0,
+                localEntry.changeHistory.records.indexWhere((localRecord) =>
+                    differingRecord.startTime.isAfter(localRecord.startTime)));
             print(
                 "${localEntry.name}: ${differingRecord.startTime} -> ${differingRecord.stopTime} in ${differingRecord.deltaTime} at index $targetIndex");
             localEntry.changeHistory.records
