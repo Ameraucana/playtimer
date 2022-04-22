@@ -37,10 +37,9 @@ class TimeDisplay extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.end,
+          alignment: WrapAlignment.center,
           children: [
             Numeral(
                 time: times[0],

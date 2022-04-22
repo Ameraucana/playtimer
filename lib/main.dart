@@ -22,6 +22,9 @@ class MyApp extends StatelessWidget {
         File(path.join(documentsDir.path, "playtimer_data", "timedItems.json"));
 
     await saveFile.create(recursive: true);
+    if (await saveFile.readAsString() == "") {
+      saveFile.writeAsString("[]");
+    }
     List<TimedItem> remoteTimedItems = [];
     List<TimedItem> localTimedItems = [];
 
@@ -49,19 +52,18 @@ class MyApp extends StatelessWidget {
     // throw an error. Being disconnected from the internet, however,
     // would cause an error to be thrown when the host resolution failed
     if (localTimedItems.isEmpty) {
-      if (await saveFile.exists()) {
-        String jsonString = await saveFile.readAsString();
-        localTimedItems = TimedItem.formTimedItems(jsonString);
-        if (localTimedItems.length == 0) {
-          print("the length was 0");
-          localTimedItems.add(TimedItem.yetUnchanged("None", 0));
-        }
-      } else {
-        saveFile.writeAsString("[]");
-        localTimedItems = [TimedItem.yetUnchanged("None", 0)];
+      String jsonString = await saveFile.readAsString();
+      localTimedItems = TimedItem.formTimedItems(jsonString);
+      if (localTimedItems.length == 0) {
+        print("the length was 0");
+        localTimedItems.add(TimedItem.yetUnchanged("None", 0));
       }
     }
-    return {"timedItems": localTimedItems, "didDownload": requestSucceeded};
+
+    return {
+      "timedItems": localTimedItems,
+      "didDownload": requestSucceeded
+    };
   }
 
   @override

@@ -47,8 +47,7 @@ class _ItemCreatorState extends State<ItemCreator> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          height: 50,
-          width: 300,
+          width: 250,
           child: TextField(
             enabled: !widget.disabled,
             focusNode: focusNode,
